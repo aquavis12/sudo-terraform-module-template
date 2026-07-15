@@ -1,7 +1,9 @@
-# Run `pre-commit install && pre-commit install --hook-type commit-msg` to activate all hooks.
+# Run `pre-commit install` to activate all hooks (commit, commit-msg, and pre-push
+# hook types are installed automatically via default_install_hook_types).
 default_install_hook_types:
   - pre-commit
   - commit-msg
+  - pre-push
 
 repos:
   - repo: https://github.com/antonbabenko/pre-commit-terraform
@@ -19,6 +21,7 @@ repos:
     hooks:
       - id: check-merge-conflict
       - id: end-of-file-fixer
+        exclude: ^(CLAUDE\.md|AGENTS\.md|\.agents/skills)$
       - id: trailing-whitespace
       - id: no-commit-to-branch
         args: ['--branch', 'main', '--branch', 'master']
@@ -36,6 +39,16 @@ repos:
           - refactor
           - test
           - ci
-          - style
           - perf
+          - build
           - revert
+
+  - repo: local
+    hooks:
+      - id: protect-default-branches
+        name: Block direct push to main/master
+        entry: scripts/hooks/pre-push-protect-branches.sh
+        language: script
+        stages: [pre-push]
+        always_run: true
+        pass_filenames: false

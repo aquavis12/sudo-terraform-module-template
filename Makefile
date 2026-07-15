@@ -8,7 +8,9 @@ setup: ## Install terraform-docs and pre-commit (requires mise + uv)
 	# uv:    https://docs.astral.sh/uv/getting-started/installation/
 	mise use -g terraform-docs@latest
 	uv tool install pre-commit
-	pre-commit install --hook-type commit-msg
+	# Installs pre-commit, commit-msg, and pre-push hooks
+	# (default_install_hook_types in .pre-commit-config.yaml).
+	pre-commit install
 
 fmt: ## Run terraform fmt
 	terraform fmt -recursive
