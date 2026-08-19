@@ -5,9 +5,7 @@ description: Use when writing, reviewing, or generating Terraform modules from t
 
 # Terraform Module Skill
 
-Activate when writing, reviewing, or generating Terraform modules from this
-template. Covers module conventions, version-floor guards, HCL patterns,
-testing, security scanning, and semver discipline.
+Activate when writing, reviewing, or generating Terraform modules from this template. Covers module conventions, version-floor guards, HCL patterns, testing, security scanning, and semver discipline.
 
 ---
 
@@ -19,8 +17,7 @@ testing, security scanning, and semver discipline.
 
 ### Feature Guard - Do NOT Emit
 
-Features below are above the 1.3.0 floor. Never emit them unless
-`required_version` is raised first.
+Features below are above the 1.3.0 floor. Never emit them unless `required_version` is raised first.
 
 | Feature | Minimum version | Consequence if emitted at 1.3 |
 |---------|----------------|-------------------------------|
@@ -36,8 +33,7 @@ Features below are above the 1.3.0 floor. Never emit them unless
 | ephemeral values | 1.10 | Parse error |
 | `write_only` / `*_wo` arguments | 1.11 | Unsupported argument |
 
-If a feature is needed, raise `required_version` in the same commit and document
-the bump in the changelog / PR description.
+If a feature is needed, raise `required_version` in the same commit and document the bump in the changelog / PR description.
 
 ---
 
@@ -65,7 +61,7 @@ The caller passes `providers = { aws.replica = aws.eu_west_1 }` on the module bl
 
 ### No Hardcoded ARN Partition
 
-- [NO] Never hardcode `arn:aws:` literals — breaks GovCloud (`aws-us-gov`) and China (`aws-cn`).
+- [NO] Never hardcode `arn:aws:` literals: breaks GovCloud (`aws-us-gov`) and China (`aws-cn`).
 - [OK] Use `data.aws_partition.current.partition` or `data.aws_caller_identity` / `data.aws_region`:
 
 ```hcl
@@ -78,9 +74,7 @@ locals {
 
 ### moved Blocks - Preserve Consumer State
 
-When renaming a resource or module address in a published module, ALWAYS add a
-`moved` block in the same commit. Without it, every consumer's next plan shows a
-destroy+create, which replaces live infrastructure.
+When renaming a resource or module address in a published module, ALWAYS add a `moved` block in the same commit. Without it, every consumer's next plan shows a destroy+create, which replaces live infrastructure.
 
 ```hcl
 moved {
@@ -90,11 +84,8 @@ moved {
 ```
 
 - `moved` cannot cross provider boundaries or state files.
-- Place `moved` blocks inside the module that owns the renamed address.
-  Consumers pick them up on the next `init`/`plan` automatically.
-- Do NOT place a `moved` block inside a module that is itself being removed —
-  the block is unreachable once the module call is deleted from the consumer's
-  configuration.
+- Place `moved` blocks inside the module that owns the renamed address. Consumers pick them up on the next `init`/`plan` automatically.
+- Do NOT place a `moved` block inside a module that is itself being removed. The block is unreachable once the module call is deleted from the consumer's configuration.
 
 ---
 
@@ -133,8 +124,7 @@ description -> type -> default -> sensitive -> nullable -> validation
 
 ### count-Gated Resources
 
-When a resource uses `count = var.create_x ? 1 : 0`, the output must handle
-the empty-list case. Use one() or try(..., null):
+When a resource uses `count = var.create_x ? 1 : 0`, the output must handle the empty-list case. Use one() or try(..., null):
 
 ```hcl
 output "role_arn" {
@@ -152,8 +142,7 @@ output "role_arn" {
 }
 ```
 
-Both return `null` when the resource is not created. Document that the output is
-nullable so consumers know to handle it.
+Both return `null` when the resource is not created. Document that the output is nullable so consumers know to handle it.
 
 ### Output Block Ordering
 
@@ -173,9 +162,9 @@ description -> value -> sensitive
 | Collection with stable identity | for_each = tomap(...) or toset(...) | Removing/reordering does not churn other addresses |
 | Keys derived from computed attrs (IDs, ARNs) | Do not - use the input variable keys instead | for_each keys must be known at plan time |
 
-- [NO] Never use `for_each` with keys derived from another resource's computed attributes — plan fails with "Invalid for_each argument".
+- [NO] Never use `for_each` with keys derived from another resource's computed attributes: plan fails with "Invalid for_each argument".
 - [OK] Drive `for_each` from user-supplied variables or static locals.
-- [NO] `depends_on` does NOT fix unknown-key errors — it orders apply, not plan-time resolution.
+- [NO] `depends_on` does NOT fix unknown-key errors. It orders apply, not plan-time resolution.
 
 ### Resource Block Ordering
 
@@ -190,8 +179,7 @@ count / for_each  (first, blank line after)
 ### Naming
 
 - The primary (or sole) resource of a given type in the module is named `this`.
-- When a module contains multiple resources of the same type, give each a
-  descriptive `snake_case` name that conveys its role.
+- When a module contains multiple resources of the same type, give each a descriptive `snake_case` name that conveys its role.
 
 ---
 
@@ -207,7 +195,7 @@ count / for_each  (first, blank line after)
 - `checkov` runs via `make checkov` and CI (see `checkov.yaml`).
 - `tflint` via `make lint` with `.tflint.hcl` config.
 - Do NOT store secrets in variable defaults or `.tfvars`.
-- `sensitive = true` only masks display — the value still lives in state. On pre-1.11, source secrets from a secrets manager at runtime.
+- `sensitive = true` only masks display, the value still lives in state. On pre-1.11, source secrets from a secrets manager at runtime.
 - Encryption at rest: default to enabled (`enable_encryption = true`).
 - Security groups: never open to `0.0.0.0/0` by default; use separate `aws_vpc_security_group_ingress_rule` / `egress_rule` resources instead of inline `ingress`/`egress` blocks.
 
@@ -235,9 +223,7 @@ Native `terraform test` requires 1.6+. For modules at `>= 1.3.0`:
 
 ## Semver & Breaking Changes
 
-This is a published reusable module. Consumers pin with exact versions
-(e.g. `version = "2.1.0"`) in their lock files; source-constrained modules
-use `version = "X.Y.Z"` directly.
+This is a published reusable module. Consumers pin with exact versions (e.g. `version = "2.1.0"`) in their lock files; source-constrained modules use `version = "X.Y.Z"` directly.
 
 ### What Constitutes a Breaking Change (major bump)
 
@@ -267,7 +253,7 @@ Use conventional commits: `feat:`, `fix:`, `feat!:` (breaking), `docs:`, `chore:
 
 ## File Layout
 
-```
+```text
 main.tf          - Primary resources
 variables.tf     - All input variables
 outputs.tf       - All output values
@@ -298,14 +284,14 @@ Before returning generated HCL, verify:
 
 - [ ] No `provider` or `backend` block in the module root.
 - [ ] No features above the 1.3 floor emitted without raising `required_version`.
-- [ ] No hardcoded `arn:aws:` — use `data.aws_partition`.
+- [ ] No hardcoded `arn:aws:`, use `data.aws_partition`.
 - [ ] `for_each` keys are plan-time known (not computed IDs).
 - [ ] `moved` blocks accompany any resource/module rename.
 - [ ] Outputs from count-gated resources use `try(..., null)` or `one()`.
 - [ ] Sensitive outputs marked `sensitive = true`.
 - [ ] Optional variables default to `null`, booleans to the safe value.
-- [ ] No `map(any)` — use typed objects with `optional()`.
+- [ ] No `map(any)`, use typed objects with `optional()`.
 - [ ] No `.terraform.lock.hcl` committed (it is gitignored).
-- [ ] No `element(concat(...))` — use `try()`.
+- [ ] No `element(concat(...))`, use `try()`.
 - [ ] No `ignore_changes = all` without explicit justification.
 - [ ] Conventional commit message on the PR.

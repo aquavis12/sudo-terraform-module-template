@@ -1,7 +1,7 @@
 # Local .terraform directories
 **/.terraform/*
 
-# Lock file — reusable modules must not pin provider builds;
+# Lock file: reusable modules must not pin provider builds;
 # consumers control the lock via their root module.
 .terraform.lock.hcl
 

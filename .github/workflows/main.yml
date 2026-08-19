@@ -38,7 +38,9 @@ jobs:
         # no-commit-to-branch is a local guard only - not meaningful in CI.
         run: |
           SKIP=terraform_validate,terraform_docs,no-commit-to-branch pre-commit run --all-files
-          SKIP=terraform_validate,terraform_docs,no-commit-to-branch pre-commit run --all-files --hook-stage pre-push
+          # Scoped to the one pre-push hook. `--hook-stage pre-push` without a hook id
+          # re-runs every hook that does not restrict its stages, doubling the job.
+          pre-commit run protect-default-branches --all-files --hook-stage pre-push
 
   checkov:
     runs-on: ubuntu-latest
