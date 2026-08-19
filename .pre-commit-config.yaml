@@ -20,8 +20,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
       - id: end-of-file-fixer
-        exclude: ^(CLAUDE\.md|AGENTS\.md|\.agents/skills)$
+        exclude: ^(CLAUDE\.md|AGENTS\.md)$
       - id: trailing-whitespace
       - id: no-commit-to-branch
         args: ['--branch', 'main', '--branch', 'master']

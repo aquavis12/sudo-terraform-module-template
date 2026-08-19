@@ -36,7 +36,9 @@ jobs:
         # terraform_validate requires `terraform init` - skipped in CI; covered by checkov.
         # terraform_docs requires terraform-docs binary - skipped in CI; runs locally.
         # no-commit-to-branch is a local guard only - not meaningful in CI.
-        run: SKIP=terraform_validate,terraform_docs,no-commit-to-branch pre-commit run --all-files
+        run: |
+          SKIP=terraform_validate,terraform_docs,no-commit-to-branch pre-commit run --all-files
+          SKIP=terraform_validate,terraform_docs,no-commit-to-branch pre-commit run --all-files --hook-stage pre-push
 
   checkov:
     runs-on: ubuntu-latest
